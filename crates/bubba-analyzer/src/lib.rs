@@ -16,7 +16,7 @@ pub use waveform::{WaveformGenerator, WaveformData, WaveformFrame};
 pub use key_detector::{KeyDetector, KeyResult};
 
 /// Bumped whenever the grid / cue analysis changes, so cached results get recomputed
-pub const ANALYSIS_VERSION: u32 = 2;
+pub const ANALYSIS_VERSION: u32 = 3;
 
 #[derive(Debug, Clone, Copy, serde::Serialize, serde::Deserialize)]
 pub struct AnalyzerConfig {

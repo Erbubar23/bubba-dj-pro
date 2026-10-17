@@ -1,6 +1,6 @@
 [package]
 name = "bubba-midi"
-version = "0.4.0"
+version = "0.5.0"
 edition = "2021"
 description = "MIDI controller hub for Bubba DJ Pro with native Pioneer DDJ-FLX4 mapping"
 

@@ -84,6 +84,7 @@ impl BeatTracker {
         let final_bpm = snap_bpm(best.0);
         let period = 60.0 * rate / final_bpm;
         let (phase, score) = fold(&onsets, period);
+        // `phase` sits on the kick BODY here; it is moved onto the attack below
         let total_energy: f32 = onsets.iter().map(|o| o.1).sum();
 
         // ---- First beat: first strong kick on the grid ----
@@ -98,6 +99,9 @@ impl BeatTracker {
         sorted.sort_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal));
         let typical = sorted.get(sorted.len() * 3 / 4).copied().unwrap_or(env.max_kick_flux);
         let first_beat_index = peaks.iter().position(|&p| p >= typical * 0.35).unwrap_or(0);
+
+        // Grid lines go on the attack of the kick, not on its body
+        let phase = align_to_attack(env, phase, period);
 
         // ---- Bar position from broadband accents ----
         // Mean (not sum) per position: a short clip has more beats on some positions
@@ -163,6 +167,39 @@ impl BeatTracker {
         let denom = c0 - 2.0 * c1 + c2;
         let offset = if denom.abs() > 1e-12 { (0.5 * (c0 - c2) / denom).clamp(-0.5, 0.5) } else { 0.0 };
         Some(range.fold(60.0 * rate / (best_lag as f64 + offset)))
+    }
+}
+
+/// The kick-band flux peaks on the BODY of long / distorted kicks (hard techno: ~100 ms
+/// after the hit). Slides the phase back onto the broadband attack (the click), searching
+/// only before the body so off-beat hats (half a beat away) are never picked.
+fn align_to_attack(env: &OnsetEnvelope, phase: f64, period: f64) -> f64 {
+    const BACK_SECONDS: f64 = 0.15;
+    const FORWARD_SECONDS: f64 = 0.02;
+    let rate = env.control_rate;
+    let flux = &env.full_flux;
+    let beats = (flux.len() as f64 / period) as usize;
+    let score = |offset: f64| -> f32 {
+        (0..beats)
+            .map(|k| OnsetEnvelope::peak_near(flux, phase + offset + k as f64 * period, 2))
+            .sum()
+    };
+    let at_body = score(0.0);
+    let (mut best_offset, mut best) = (0.0, at_body);
+    let mut offset = -BACK_SECONDS * rate;
+    while offset <= FORWARD_SECONDS * rate {
+        let s = score(offset);
+        if s > best {
+            best = s;
+            best_offset = offset;
+        }
+        offset += 1.0;
+    }
+    // Only move when the attack is clearly there (pure sine kicks have no click)
+    if best > at_body * 1.5 {
+        phase + best_offset
+    } else {
+        phase
     }
 }
 

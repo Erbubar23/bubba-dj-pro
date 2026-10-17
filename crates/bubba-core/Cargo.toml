@@ -1,6 +1,6 @@
 [package]
 name = "bubba-core"
-version = "0.4.0"
+version = "0.5.0"
 edition = "2021"
 description = "Real-time, low-latency audio engine and mixer for Bubba DJ Pro"
 

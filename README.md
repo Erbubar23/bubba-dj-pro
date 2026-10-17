@@ -1,4 +1,4 @@
-# 🎧 BUBBA DJ PRO v0.4.0
+# 🎧 BUBBA DJ PRO v0.5.0
 
 Software DJ ligero de código abierto para Windows, escrito en Rust, con soporte nativo para **Pioneer DDJ-FLX4** (y la familia DDJ-400).
 

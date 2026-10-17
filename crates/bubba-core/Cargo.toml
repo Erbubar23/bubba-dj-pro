@@ -1,0 +1,16 @@
+[package]
+name = "bubba-core"
+version = "0.4.0"
+edition = "2021"
+description = "Real-time, low-latency audio engine and mixer for Bubba DJ Pro"
+
+[dependencies]
+cpal = { workspace = true }
+crossbeam-channel = { workspace = true }
+bubba-analyzer = { path = "../bubba-analyzer" }
+bubba-midi = { path = "../bubba-midi" }
+serde = { workspace = true }
+serde_json = { workspace = true }
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+log = { workspace = true }

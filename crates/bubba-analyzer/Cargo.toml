@@ -1,0 +1,19 @@
+[package]
+name = "bubba-analyzer"
+version = "0.5.0"
+edition = "2021"
+description = "Turbo-analyzer for DJ tracks: BPM, beat grid (neural + DSP), key, cue suggestions and 3-band RGB waveforms"
+
+[features]
+default = ["neural"]
+# Beat This! neural beat/downbeat tracker (adds ~10 MB of embedded model)
+neural = ["dep:beat-this"]
+
+[dependencies]
+symphonia = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+log = { workspace = true }
+beat-this = { version = "1.1", default-features = false, optional = true }

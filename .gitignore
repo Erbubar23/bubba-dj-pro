@@ -1,0 +1,15 @@
+# Build output
+/target/
+/dist/
+
+# Binaries (publish them as GitHub Releases instead)
+*.exe
+*.pdb
+
+# Test audio (regenerate with generate_test_track*.py)
+*.wav
+
+# Editor / OS
+.vscode/
+.idea/
+Thumbs.db

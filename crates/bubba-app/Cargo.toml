@@ -1,0 +1,18 @@
+[package]
+name = "bubba-app"
+version = "0.4.0"
+edition = "2021"
+description = "Bubba DJ Pro - Next-generation lightweight DJ software application"
+
+[dependencies]
+bubba-core = { path = "../bubba-core" }
+bubba-analyzer = { path = "../bubba-analyzer" }
+bubba-midi = { path = "../bubba-midi" }
+crossbeam-channel = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+anyhow = { workspace = true }
+log = { workspace = true }
+env_logger = { workspace = true }
+tiny_http = "0.12"
+tungstenite = "0.26"

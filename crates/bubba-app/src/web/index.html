@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bubba DJ Pro</title>
+  <link rel="stylesheet" href="style.css">
+  <script>window.BUBBA = { wsPort: {{WS_PORT}}, token: "{{TOKEN}}" };</script>
+</head>
+<body>
+  <div class="app" id="app">
+
+    <!-- ============ TOP BAR ============ -->
+    <header class="topbar">
+      <div class="brand">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <circle cx="16" cy="16" r="14.5" fill="none" stroke="currentColor" stroke-width="2"/>
+          <circle cx="16" cy="16" r="9" fill="none" stroke="currentColor" stroke-opacity=".45" stroke-width="1.5"/>
+          <circle cx="16" cy="16" r="3" fill="currentColor"/>
+          <path d="M16 1.5 A14.5 14.5 0 0 1 30.5 16" fill="none" stroke="var(--accent-b)" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+        <span class="brand-name">BUBBA<span class="brand-dj">DJ</span><span class="brand-pro">PRO</span></span>
+      </div>
+
+      <div class="topbar-center">
+        <div class="master-tempo" title="Tempo del deck master">
+          <span class="mt-label">MASTER</span>
+          <span id="master-bpm" class="mt-value">—</span>
+          <span class="mt-unit">BPM</span>
+        </div>
+        <div class="phase-meter" id="phase-meter" title="Alineación de fase entre decks">
+          <div class="pm-track"><div class="pm-center"></div><div id="pm-needle" class="pm-needle"></div></div>
+          <span class="pm-label">FASE</span>
+        </div>
+        <div id="key-compat" class="key-compat" title="Compatibilidad armónica (Camelot)">—</div>
+        <div class="sync-mode" id="sync-mode" role="group" aria-label="Modo de SYNC">
+          <span class="sm-label">SYNC</span>
+          <button data-mode="Standard" title="Como rekordbox: el fader del deck sincronizado no actúa; al apagar SYNC retoma el control cuando lo llevas al tempo actual (marca naranja)">rekordbox</button>
+          <button data-mode="Relative" title="Como Serato DJ Pro: al sincronizar, el tempo pasa a ser el nuevo 0% y el fader sube o baja desde ahí, moviendo ambos decks">Serato 0%</button>
+        </div>
+      </div>
+
+      <div class="topbar-right">
+        <button id="midi-pill" class="pill" title="Controlador MIDI">
+          <span class="dot"></span><span id="midi-text">Buscando controlador…</span>
+        </button>
+        <button id="audio-pill" class="pill" title="Configuración de audio">
+          <svg class="ico" viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg>
+          <span id="audio-text">Audio…</span>
+        </button>
+        <button class="icon-btn" id="btn-help" title="Atajos de teclado (?)">
+          <svg class="ico" viewBox="0 0 24 24"><rect x="2.5" y="6" width="19" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M6 10h1M9 10h1M12 10h1M15 10h1M18 10h0M7 14h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </button>
+        <button class="icon-btn" id="btn-fullscreen" title="Pantalla completa (F11)">
+          <svg class="ico" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <button class="icon-btn" id="btn-settings" title="Configuración">
+          <svg class="ico" viewBox="0 0 24 24"><path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M19.4 13.5l1.6 1.2-2 3.4-1.9-.7a7.6 7.6 0 0 1-1.8 1l-.3 2h-4l-.3-2a7.6 7.6 0 0 1-1.8-1l-1.9.7-2-3.4 1.6-1.2a7.7 7.7 0 0 1 0-3L3 9.3l2-3.4 1.9.7a7.6 7.6 0 0 1 1.8-1l.3-2h4l.3 2a7.6 7.6 0 0 1 1.8 1l1.9-.7 2 3.4-1.6 1.2a7.7 7.7 0 0 1 0 3z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- ============ WAVEFORMS ============ -->
+    <section class="waves" id="waves">
+      <div class="wave-row" data-deck="0">
+        <div class="wave-side">
+          <span class="deck-letter">1</span>
+          <span class="beat-counter" data-bind="counter">—</span>
+          <div class="beat-dots" data-bind="dots"><i></i><i></i><i></i><i></i></div>
+        </div>
+        <div class="wave-canvas-wrap">
+          <canvas class="wave-canvas"></canvas>
+        </div>
+      </div>
+      <div class="wave-row" data-deck="1">
+        <div class="wave-side">
+          <span class="deck-letter">2</span>
+          <span class="beat-counter" data-bind="counter">—</span>
+          <div class="beat-dots" data-bind="dots"><i></i><i></i><i></i><i></i></div>
+        </div>
+        <div class="wave-canvas-wrap">
+          <canvas class="wave-canvas"></canvas>
+        </div>
+      </div>
+      <div class="wave-zoom">
+        <button class="mini-btn" id="zoom-in" title="Acercar">+</button>
+        <button class="mini-btn" id="zoom-out" title="Alejar">−</button>
+      </div>
+    </section>
+
+    <!-- ============ DECKS + MIXER ============ -->
+    <section class="console">
+      <div class="deck" data-deck="0" id="deck-0"></div>
+      <div class="mixer" id="mixer"></div>
+      <div class="deck" data-deck="1" id="deck-1"></div>
+    </section>
+
+    <!-- ============ LIBRARY ============ -->
+    <div class="lib-resizer" id="lib-resizer" title="Arrastra para cambiar el tamaño"></div>
+    <section class="library" id="library">
+      <aside class="lib-side">
+        <div class="lib-side-title">FUENTES</div>
+        <nav id="lib-roots" class="lib-roots"></nav>
+        <div class="lib-side-title">SESIÓN</div>
+        <nav class="lib-roots">
+          <button class="lib-root" id="lib-history"><span class="ico-sm">⟲</span>Historial</button>
+        </nav>
+      </aside>
+      <div class="lib-main">
+        <div class="lib-toolbar">
+          <button class="mini-btn" id="lib-up" title="Carpeta superior">↑</button>
+          <div class="crumbs" id="lib-crumbs"></div>
+          <div class="search">
+            <svg class="ico" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M16 16l4.5 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            <input id="lib-search" type="search" placeholder="Buscar en la carpeta (Ctrl+F)" autocomplete="off" spellcheck="false">
+          </div>
+        </div>
+        <div class="lib-table-wrap" id="lib-table-wrap">
+          <table class="lib-table">
+            <thead>
+              <tr>
+                <th class="c-load"></th>
+                <th class="c-title" data-sort="title">Título</th>
+                <th class="c-artist" data-sort="artist">Artista</th>
+                <th class="c-bpm" data-sort="bpm">BPM</th>
+                <th class="c-key" data-sort="camelot">Tono</th>
+                <th class="c-time" data-sort="duration">Duración</th>
+                <th class="c-ext" data-sort="ext">Formato</th>
+              </tr>
+            </thead>
+            <tbody id="lib-body"></tbody>
+          </table>
+          <div class="lib-empty hidden" id="lib-empty"></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ============ SETTINGS MODAL ============ -->
+  <div class="modal hidden" id="settings-modal">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h2>Configuración de audio</h2>
+        <button class="icon-btn" data-close>✕</button>
+      </div>
+      <div class="modal-body">
+        <p class="muted">Envía el <b>Master</b> a tu interfaz principal (Behringer UMC, FLX4…) y la <b>pre-escucha</b> a otra tarjeta (por ejemplo la salida de 3.5 mm de tu PC), igual que en Serato.</p>
+        <label class="field">
+          <span>Salida Master (público)</span>
+          <select id="sel-master"></select>
+        </label>
+        <label class="field">
+          <span>Salida de audífonos (pre-escucha / CUE)</span>
+          <select id="sel-headphone"></select>
+        </label>
+        <div class="routing-info" id="routing-info"></div>
+        <div class="routing-error hidden" id="routing-error"></div>
+      </div>
+      <div class="modal-foot">
+        <span class="muted small" id="version-label"></span>
+        <div class="grow"></div>
+        <button class="btn" data-close>Cancelar</button>
+        <button class="btn btn-primary" id="btn-apply-audio">Aplicar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ HELP MODAL ============ -->
+  <div class="modal hidden" id="help-modal">
+    <div class="modal-card modal-wide">
+      <div class="modal-head">
+        <h2>Atajos de teclado</h2>
+        <button class="icon-btn" data-close>✕</button>
+      </div>
+      <div class="modal-body help-grid">
+        <div>
+          <h3>Deck 1</h3>
+          <dl>
+            <dt><kbd>Q</kbd></dt><dd>CUE (mantener)</dd>
+            <dt><kbd>W</kbd></dt><dd>Play / Pausa</dd>
+            <dt><kbd>E</kbd></dt><dd>Sync</dd>
+            <dt><kbd>1</kbd>–<kbd>4</kbd></dt><dd>Hot cues 1–4</dd>
+            <dt><kbd>A</kbd> / <kbd>S</kbd></dt><dd>Loop ÷2 / ×2</dd>
+            <dt><kbd>D</kbd></dt><dd>Auto loop</dd>
+          </dl>
+        </div>
+        <div>
+          <h3>Deck 2</h3>
+          <dl>
+            <dt><kbd>U</kbd></dt><dd>CUE (mantener)</dd>
+            <dt><kbd>I</kbd></dt><dd>Play / Pausa</dd>
+            <dt><kbd>O</kbd></dt><dd>Sync</dd>
+            <dt><kbd>7</kbd>–<kbd>0</kbd></dt><dd>Hot cues 1–4</dd>
+            <dt><kbd>J</kbd> / <kbd>K</kbd></dt><dd>Loop ÷2 / ×2</dd>
+            <dt><kbd>L</kbd></dt><dd>Auto loop</dd>
+          </dl>
+        </div>
+        <div>
+          <h3>Biblioteca y general</h3>
+          <dl>
+            <dt><kbd>↑</kbd> <kbd>↓</kbd></dt><dd>Mover selección</dd>
+            <dt><kbd>Shift</kbd>+<kbd>←</kbd></dt><dd>Cargar en Deck 1</dd>
+            <dt><kbd>Shift</kbd>+<kbd>→</kbd></dt><dd>Cargar en Deck 2</dd>
+            <dt><kbd>Enter</kbd></dt><dd>Abrir carpeta</dd>
+            <dt><kbd>Ctrl</kbd>+<kbd>F</kbd></dt><dd>Buscar</dd>
+            <dt><kbd>?</kbd></dt><dd>Esta ayuda</dd>
+          </dl>
+          <p class="muted small">Perillas: arrastra arriba/abajo, rueda del ratón, doble clic = centro. <kbd>Shift</kbd> al arrastrar = ajuste fino. <kbd>Shift</kbd>+clic en un hot cue lo borra. Mantén <kbd>Shift</kbd> al cargar para reemplazar un deck que está sonando.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ OVERLAYS ============ -->
+  <div class="toasts" id="toasts"></div>
+  <div class="offline hidden" id="offline">
+    <div class="spinner"></div>
+    <div>Conectando con el motor de audio…</div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
